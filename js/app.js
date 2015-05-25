@@ -37,7 +37,7 @@ angular.module('myApp', ['ngRoute'])
 		controller:'SettingsController',
 		templateUrl:'../templates/settings.html'
 	})
-};)
+})
 .controller('MainController',function ($scope, $timeout, $location) {
 
 	//Date object 
