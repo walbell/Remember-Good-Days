@@ -9,7 +9,6 @@
 		//Date object 
 		$scope.date={};
 		$scope.go = function ( path ) {
-	      console.log(path);
 		  $location.path( path );
 		};
 

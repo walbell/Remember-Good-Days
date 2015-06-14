@@ -13,7 +13,6 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule'])
 	$routeProvider
 	.when('/',
 	{
-		controller:'ImagesController',
 		templateUrl:'../templates/main.html'
 	})
 	.when('/settings',
@@ -32,36 +31,15 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule'])
 
 	var ImagesController = function ($scope, feedService) {
 
+		console.log('IMAGES ImagesController');
+
 		$scope.ImagesUrl=[];
-
-		// for (var i=0; i<20; i++)
-		// {
-		// 	if(i%3 === 0)
-		// 	{
-		// 		$scope.ImagesUrl.push('http://miriadna.com/desctopwalls/images/max/Ideal-landscape.jpg');
-		// 	}
-		// 	else if(i%3 === 1)
-		// 	{
-		// 		$scope.ImagesUrl.push('http://www.inewmedia.org/wp-content/uploads/2014/05/501ffaae9b1a0477f75898926fe0708c.jpg');
-		// 	}
-		// 	else if(i%3 === 2)
-		// 	{
-		// 		$scope.ImagesUrl.push('http://www.vacanzesenesi.it/wp-content/uploads/2014/05/vela.jpg');
-		// 	}
-		// }
-
-		// console.log('SECOND');
 		
 		function getFeed(){
-			feedService.getUserMedia().then(function(data){
-				console.log('from the ImagesController', data);
-
-				$scope.$watch('ImagesUrl', function() {
-					for (var i in data.data) {
-					console.log(data.data[i].images.standard_resolution);
-					$scope.ImagesUrl.push(data.data[i].images.standard_resolution.url);
+			feedService.getUserMedia().then(function(user_media_list){
+				for (var i in user_media_list) {
+					$scope.ImagesUrl.push(user_media_list[i].images.standard_resolution.url);
 				}
-				});
 			});
 		}
 
@@ -86,7 +64,6 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule'])
 		//Date object 
 		$scope.date={};
 		$scope.go = function ( path ) {
-	      console.log(path);
 		  $location.path( path );
 		};
 
@@ -121,11 +98,8 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule'])
 		authService.initialize();
 
 		$scope.login = function () {
-			console.log('login');
-
 			authService.connectInstagram()
 			.then(function(data) {
-				console.log('data is ',data);
 				$scope.user = data.user;
 			})
 
@@ -229,21 +203,41 @@ require('angular-local-storage');
 (function(){
 	var feedService = function($q, $http, userService) {
 
-		var instagramServerAPI = 'https://api.instagram.com/v1/';
+		var instagramServerAPI = 'https://api.instagram.com/v1/',
+			user_media_list = [];
+
 
 		return {
 			getUserMedia: function() {
 
 				var access_token = userService.getUserToken(),
-					endpoint = instagramServerAPI + 'users/49267726/media/recent?access_token=49267726.6e1a144.c41faeb4d5d446f2ba1e49a0fec0a1e0&callback=JSON_CALLBACK',
+					user_id = userService.getUserId(),
+					endpoint = instagramServerAPI + 'users/' + user_id + '/media/recent?access_token=' + access_token + '&callback=JSON_CALLBACK&count=50',
 					deferred = $q.defer();
 
-				console.log('endpoint is ' + endpoint); 
 
-				$http.jsonp(endpoint).success(function(response) {
-                       console.log('response ', response);
-                       deferred.resolve(response);
+				function getRecentMedia (URL, count){
+					console.log('chiamata con...' + URL + '...');
+					$http.jsonp(URL.replace(/angular.callbacks._\d/,'JSON_CALLBACK')).success(function(response) {
+						console.log('response', response);
+						
+						for (var i in response.data) {
+							user_media_list.push(response.data[i]);
+						}
+
+						if (response.pagination.next_url && count <= 5) {
+						   console.log('An ' + count + ' ' + response.pagination.next_url);
+						   count = count + 1;
+	                       getRecentMedia(response.pagination.next_url, count);
+						}
+						else {
+							console.log('Risolvo la promise con ', user_media_list)
+							deferred.resolve(user_media_list);
+						}
                 	});
+                }
+
+                getRecentMedia(endpoint, 0);
 
 				return deferred.promise;
 			}
@@ -258,20 +252,18 @@ require('angular-local-storage');
 	var userService = function (localStorageService) {
 		return {
 			storeUserToken: function(user_token){
-				console.log('saving token ', user_token);
 				localStorageService.set('user_token', user_token);
 			},
 			getUserToken: function(){
 				var userToken = localStorageService.get('user_token');
-				console.log('stored_token ', userToken);
+				return userToken;
 			},
 			storeUserId: function(user_id){
-				console.log('saving user_id ', user_id);
 				localStorageService.set('user_id', user_id);
 			},
 			getUserId: function(){
 				var user_id = localStorageService.get('user_id');
-				console.log('user_id ', user_id);
+				return user_id;
 			}
 		}
 	};

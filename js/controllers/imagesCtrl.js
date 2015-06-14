@@ -6,36 +6,15 @@
 
 	var ImagesController = function ($scope, feedService) {
 
+		console.log('IMAGES ImagesController');
+
 		$scope.ImagesUrl=[];
-
-		// for (var i=0; i<20; i++)
-		// {
-		// 	if(i%3 === 0)
-		// 	{
-		// 		$scope.ImagesUrl.push('http://miriadna.com/desctopwalls/images/max/Ideal-landscape.jpg');
-		// 	}
-		// 	else if(i%3 === 1)
-		// 	{
-		// 		$scope.ImagesUrl.push('http://www.inewmedia.org/wp-content/uploads/2014/05/501ffaae9b1a0477f75898926fe0708c.jpg');
-		// 	}
-		// 	else if(i%3 === 2)
-		// 	{
-		// 		$scope.ImagesUrl.push('http://www.vacanzesenesi.it/wp-content/uploads/2014/05/vela.jpg');
-		// 	}
-		// }
-
-		// console.log('SECOND');
 		
 		function getFeed(){
-			feedService.getUserMedia().then(function(data){
-				console.log('from the ImagesController', data);
-
-				$scope.$watch('ImagesUrl', function() {
-					for (var i in data.data) {
-					console.log(data.data[i].images.standard_resolution);
-					$scope.ImagesUrl.push(data.data[i].images.standard_resolution.url);
+			feedService.getUserMedia().then(function(user_media_list){
+				for (var i in user_media_list) {
+					$scope.ImagesUrl.push(user_media_list[i].images.standard_resolution.url);
 				}
-				});
 			});
 		}
 

@@ -1,21 +1,41 @@
 (function(){
 	var feedService = function($q, $http, userService) {
 
-		var instagramServerAPI = 'https://api.instagram.com/v1/';
+		var instagramServerAPI = 'https://api.instagram.com/v1/',
+			user_media_list = [];
+
 
 		return {
 			getUserMedia: function() {
 
 				var access_token = userService.getUserToken(),
-					endpoint = instagramServerAPI + 'users/49267726/media/recent?access_token=49267726.6e1a144.c41faeb4d5d446f2ba1e49a0fec0a1e0&callback=JSON_CALLBACK',
+					user_id = userService.getUserId(),
+					endpoint = instagramServerAPI + 'users/' + user_id + '/media/recent?access_token=' + access_token + '&callback=JSON_CALLBACK&count=50',
 					deferred = $q.defer();
 
-				console.log('endpoint is ' + endpoint); 
 
-				$http.jsonp(endpoint).success(function(response) {
-                       console.log('response ', response);
-                       deferred.resolve(response);
+				function getRecentMedia (URL, count){
+					console.log('chiamata con...' + URL + '...');
+					$http.jsonp(URL.replace(/angular.callbacks._\d/,'JSON_CALLBACK')).success(function(response) {
+						console.log('response', response);
+						
+						for (var i in response.data) {
+							user_media_list.push(response.data[i]);
+						}
+
+						if (response.pagination.next_url && count <= 5) {
+						   console.log('An ' + count + ' ' + response.pagination.next_url);
+						   count = count + 1;
+	                       getRecentMedia(response.pagination.next_url, count);
+						}
+						else {
+							console.log('Risolvo la promise con ', user_media_list)
+							deferred.resolve(user_media_list);
+						}
                 	});
+                }
+
+                getRecentMedia(endpoint, 0);
 
 				return deferred.promise;
 			}

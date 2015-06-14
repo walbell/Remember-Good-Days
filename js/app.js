@@ -12,7 +12,6 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule'])
 	$routeProvider
 	.when('/',
 	{
-		controller:'ImagesController',
 		templateUrl:'../templates/main.html'
 	})
 	.when('/settings',

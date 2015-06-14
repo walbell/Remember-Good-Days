@@ -14,11 +14,8 @@
 		authService.initialize();
 
 		$scope.login = function () {
-			console.log('login');
-
 			authService.connectInstagram()
 			.then(function(data) {
-				console.log('data is ',data);
 				$scope.user = data.user;
 			})
 
