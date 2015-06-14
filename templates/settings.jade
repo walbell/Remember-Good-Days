@@ -1,0 +1,7 @@
+.container.text-center
+	button.btn.btn-default.btn-lg(type='button' ng-click='login()')
+		span.glyphicon(aria-hidden='true')
+		| Login with Instagram
+	div(ng-show='user')
+		h1 {{user.username}}
+		img(src='{{user.profile_picture}}')

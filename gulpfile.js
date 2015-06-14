@@ -1,18 +1,19 @@
-'use strict';
-
 var gulp = require('gulp'),
 	jade = require('gulp-jade'),
 	browserify = require('gulp-browserify'),
 	stringify = require('stringify'),
 	color = require('cli-color'),
 	stylus = require('gulp-stylus'),
-	dependants = require('dependants-parser');
-
+	dependants = require('dependants-parser'),
+    changed = require('gulp-changed'),
+    runSequence = require('run-sequence'),
+    lr = require('tiny-lr');
 /*
  * Initialise Tiny LiveReload and environment variables
  */
 
-var env = process.env.NODE_ENV || 'development',
+var server = lr(),
+    env = process.env.NODE_ENV || 'development',
     production = env === 'production',
     buildMode = process.argv.indexOf('build') !== -1;
 
@@ -22,9 +23,9 @@ var env = process.env.NODE_ENV || 'development',
 
 var paths = {
 	staticDir  : 'www',
-    views      : { watch: [ 'templates/**/*.jade'], srcBase: 'templates/', src: 'templates/**/*.jade', out: 'www' },
+    views      : { watch: [ 'templates/**/*.jade'], srcBase: 'templates/', src: 'templates/**/*.jade', out: 'www/templates' },
     browserify : { watch: [ 'js/**/*.js', 'www/**/*.html' ], src: 'js/index.js', out: 'www/js', main: 'index.js' },
-    styles     : { watch: [ 'styles/**/*.styl' ], src: 'styles/styles.styl', out: 'www/css' }
+    styles     : { watch: [ 'styles/**/*.styl' ], src: 'styles/main.styl', out: 'www/css' }
 };
 
 /*
@@ -77,21 +78,12 @@ gulp.task('styles', function () {
  */
 
 gulp.task('views', function (next) {
-    var dep = [],
-        changedFiles = [];
-
     var stream = gulp
     .src(paths.views.src)
     .on('data', function (change) {
         if (!change.history) {
-            changedFiles = [];
             return;
         }
-
-        var file = change.history[0];
-
-        dep = dependants.findSync(file, 'views', dependants.patterns.jade);
-        changedFiles = dep;
     })
     .pipe(jade())
     .on('error', function (err) {
@@ -99,26 +91,39 @@ gulp.task('views', function (next) {
         next();
     });
 
-    if (!buildMode && !production) {
-        stream = stream.pipe(changed(paths.views.out, {
-            hasChanged: function (stream, callback, sourceFile) {
-                for(var i = 0; i < arguments.length; i ++) {
-                    if (changedFiles.indexOf(sourceFile.history[0]) !== -1) {
-                        return callback(null, true);
-                    }
-                }
-
-                return changed.compareLastModifiedTime.apply(this, arguments);
-            }
-        }));
-    }
-
     stream = stream
     .pipe(gulp.dest(paths.views.out))
     .on('end', next);
 });
 
+/*
+ * Build the codebase
+ */
 
-gulp.task('default', function() {
-  // place code for your default task here
+gulp.task('build', [ 'views' ], function (done) {
+    runSequence([ 'styles', 'browserify' ], done);
 });
+
+/*
+ * LiveReload server task
+ */
+
+gulp.task('listen', function (next) {
+    server.listen(35729, next);
+});
+
+/*
+ * Watch the codebase for changes
+ */
+
+gulp.task('watch', [ 'build', 'listen' ], function () {
+    gulp.watch(paths.browserify.watch, [ 'browserify' ]);
+    gulp.watch(paths.styles.watch, [ 'styles' ]);
+    gulp.watch(paths.views.watch, [ 'views' ]);
+});
+
+/*
+ * Default task set to build
+ */
+
+gulp.task('default', [ 'build' ]);
