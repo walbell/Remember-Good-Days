@@ -1,12 +1,12 @@
 .my-container(ng-controller='MainController')
     div(id='datetime')
         h1 {{ date.raw | date:'hh mm ss' }}
-        h2 {{ date.raw | date:'EEEE, MMMM yyyy' }}
+        h2 {{ date.raw | date:'EEEE, dd MMMM yyyy' }}
         
 
-.images-container(ng-controller='ImagesController')
-    .box-image(ng-repeat='image in ImagesUrl track by $index')
-        img(src='{{image}}')
+.images-container(ng-controller='ImagesController' )
+    .box-image.cssFade(ng-repeat='image in ImagesUrl track by $index' ng-show='display_images')
+        img(src='{{image}}' imageonload)
 
 .settings(ng-controller='MainController')
     button.btn.btn-default.btn-lg(ng-click="go('/settings')" type='button')

@@ -7,7 +7,7 @@
 
 'use strict';
 
-angular.module('myApp', ['ngRoute', 'LocalStorageModule'])
+angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 .config(function($routeProvider){
 	$routeProvider
 	.when('/',
@@ -20,3 +20,13 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule'])
 		templateUrl:'../templates/settings.html'
 	})
 })
+.directive('imageonload', function($rootScope) {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            element.bind('load', function() {
+                $rootScope.$emit('rootScope:emit');
+            });
+        }
+    };
+});
