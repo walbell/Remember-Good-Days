@@ -39,11 +39,13 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 
 (function(){
 
-	var ImagesController = function ($scope, feedService, $rootScope) {
+	var ImagesController = function ($scope, feedService, $rootScope, $timeout) {
 
 		$scope.images_loaded = 0;
 		$scope.display_images = false;
 		$scope.ImagesUrl=[];
+		//Date object 
+		$scope.date={};
 
 		var MAX_PHOTOS = 18;
 		
@@ -75,10 +77,17 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 			}
 		});
 
-		getFeed(); 
+		getFeed();
+
+		var updateTime = function(){
+			$scope.date.raw=new Date();
+			$timeout(updateTime, 1000);
+		};
+
+		updateTime(); 
 	};
 
-	ImagesController.$inject = ['$scope', 'feedService', '$rootScope'];
+	ImagesController.$inject = ['$scope', 'feedService', '$rootScope', '$timeout'];
 
 	angular.module('myApp').controller('ImagesController', ImagesController);
 

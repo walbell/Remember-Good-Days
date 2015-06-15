@@ -18,21 +18,23 @@ body {
   height: 100%;
 }
 #datetime {
+  position: relative;
   padding: 5px;
   text-align: center;
   z-index: 100;
   background-color: rgba(0,0,0,0.5);
-  border-radius: 10px;
+  width: 234px;
+  height: 100%;
 }
 #datetime h1 {
   padding-left: 5px;
   padding-right: 5px;
-  font-size: 6.1em;
+  font-size: 2.8em;
   color: #fff;
 }
 #datetime h2 {
-  font-size: 2em;
-  color: #c8c8c8;
+  font-size: 1em;
+  color: #fff;
 }
 .images-container {
   width: 100%;
@@ -52,8 +54,7 @@ body {
 }
 .ng-hide-add,
 .ng-hide-remove {
-/* ensure visibility during the transition */
-  display: block !important; /* yes, important */
+  display: block !important;
 }
 .cssFade {
   transition: 0.5s ease all;
@@ -73,9 +74,29 @@ body {
 }
 .box-image > img {
   height: 100%;
+  border: 1px solid #fff;
+}
+.transparent {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.3;
 }
 .settings {
   position: absolute;
   bottom: 5px;
   right: 5px;
+}
+.user-info {
+  padding: 50px;
+}
+.user-info h5 {
+  color: #fff;
+}
+.user-info img {
+  height: 75px;
+  width: 75px;
+  border-radius: 100%;
+  border: 1px solid #fff;
 }
