@@ -1,7 +1,7 @@
 {
  "manifest_version": 2,
 	"name": "Remember good days",
-	"description": "Tab app to show best moments from facebook",
+	"description": "Tab app to show best moments from instagram",
     "version": "0.1",
     "background": {
       "scripts": ["js/vendor/angular.min.js"]

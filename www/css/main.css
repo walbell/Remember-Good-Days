@@ -74,7 +74,6 @@ body {
 }
 .box-image > img {
   height: 100%;
-  border: 1px solid #fff;
 }
 .transparent {
   width: 100%;

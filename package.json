@@ -4,7 +4,10 @@
   "description": "Chrome Extension to show your best photos on social when you open a new tab",
   "main": "index.js",
   "dependencies": {
+    "angular": "^1.4.1",
+    "angular-animate": "^1.4.1",
     "angular-local-storage": "^0.2.2",
+    "angular-route": "^1.4.1",
     "browserify": "^10.2.0",
     "cli-color": "^1.0.0",
     "dependants-parser": "0.0.5",
