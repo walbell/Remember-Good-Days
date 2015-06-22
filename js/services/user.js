@@ -14,7 +14,19 @@
 			getUserId: function(){
 				var user_id = localStorageService.get('user_id');
 				return user_id;
-			}
+			},
+			storeUserFeed: function(user_feed){
+				localStorageService.set('user_feed', user_feed);
+			},
+			getUserFeed: function(){
+				return localStorageService.get('user_feed');
+			},
+			storeCurrentUserTimestamp: function(){
+				localStorageService.set('user_timestamp', new Date());
+			},
+			getCurrentUserTimestamp: function(){
+				return localStorageService.get('user_timestamp');
+			},
 		}
 	};
 

@@ -4,7 +4,6 @@
 		var instagramServerAPI = 'https://api.instagram.com/v1/',
 			user_media_list = [];
 
-
 		return {
 			getUserMedia: function() {
 
@@ -27,6 +26,12 @@
 	                       getRecentMedia(response.pagination.next_url, count);
 						}
 						else {
+							userService.storeUserFeed(user_media_list);
+							userService.storeCurrentUserTimestamp();
+							console.log('user_feed',userService.getUserFeed());
+							console.log('timestamp',userService.getCurrentUserTimestamp());
+							var data = new Date();
+							console.log('difference ', data - Date.parse(userService.getCurrentUserTimestamp()));
 							deferred.resolve(user_media_list);
 						}
                 	});

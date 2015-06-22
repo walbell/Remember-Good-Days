@@ -19,24 +19,36 @@ html, body
     height 100%
 
 #datetime
-    position relative
-    padding 5px
     text-align center
     z-index 100
     background-color rgba(0,0,0,0.5)
-    width 234px
+    width 100%
     height 100%
+    
+    display -webkit-box      /* OLD - iOS 6-, Safari 3.1-6 */
+    display -moz-box         /* OLD - Firefox 19- (buggy but mostly works) */
+    display -ms-flexbox      /* TWEENER - IE 10 */
+    display -webkit-flex 
+    display flex
+    flex-direction row
+    flex-wrap wrap
+    align-items center
+    justify-content center
 
-#datetime h1 
+#datetime .info h1
     padding-left 5px
     padding-right 5px
     font-size 2.8em
     color white
 
-#datetime h2 
+#datetime .info h2 
     font-size 1em
     // color rgb(200,200,200)
     color white
+
+.info
+    position relative
+    height 100%
 
 .images-container
     width 100%
@@ -62,28 +74,31 @@ html, body
 
 .fade
     transition 0.5s ease all
+    height 33.3%
+    width auto
 
 .box-image
 
     /*width 300px
     height 300px*/
     height 33.333333%
+    width 100%
     margin 0
     padding 0
     overflow hidden
     display inline
 
-.box-image > img
+.box-image img
 
     height 100%
     // border 1px solid white
 
     
 .transparent
-    width 100%
-    position absolute
-    top 0
-    left 0
+    //width 100%
+    // position absolute
+    // top 0
+    // left 0
     opacity 0.3
 
 .settings
