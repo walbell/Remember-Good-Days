@@ -256,9 +256,10 @@ require('angular-local-storage');
 					endpoint = instagramServerAPI + 'users/' + user_id + '/media/recent?access_token=' + access_token + '&callback=JSON_CALLBACK&count=50',
 					deferred = $q.defer();
 
-
 				function getRecentMedia (URL, count){
 					$http.jsonp(URL.replace(/angular.callbacks._\d/,'JSON_CALLBACK')).success(function(response) {
+
+						console.log('getting data', response.data);
 						
 						for (var i in response.data) {
 							user_media_list.push(response.data[i]);

@@ -1,5 +1,5 @@
 .images-container(ng-controller='ImagesController' )
-	.box-image.cssFade(ng-repeat='image in ImagesUrl track by $index' ng-show='display_images')
+	.box-image.fade(ng-repeat='image in ImagesUrl track by $index' ng-class="{'fadeIn': display_images}")
 		img(src='{{image}}' imageonload ng-show='$index!==7')
 		div(id='datetime' ng-show='$index===7')
 			h1 {{ date.raw | date:'hh mm ss' }}
