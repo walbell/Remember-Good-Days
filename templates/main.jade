@@ -2,10 +2,12 @@
 	.box-image.fade(ng-repeat='image in ImagesUrl track by $index' ng-class="{'fadeIn': display_images}")
 		img(src='{{image}}' imageonload ng-show='$index!==7')
 		div(id='datetime' ng-show='$index===7')
-			h1 {{ date.raw | date:'hh mm ss' }}
-			h2 {{ date.raw | date:'EEEE' }}
-			h2 {{ date.raw | date:'dd MMMM yyyy' }}
 			img.transparent(src='{{image}}' imageonload ng-show='$index===7')
+			div.info
+				h1 {{ date.raw | date:'hh mm ss' }}
+				h2 {{ date.raw | date:'EEEE' }}
+				h2 {{ date.raw | date:'dd MMMM yyyy' }}
+			
 
 .settings(ng-controller='MainController')
 	button.btn.btn-block.btn-lg.btn-inverse(ng-click="go('/settings')" type='button') Settings

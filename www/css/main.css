@@ -18,20 +18,12 @@ body {
   height: 100%;
 }
 #datetime {
+  position: relative;
   text-align: center;
   z-index: 100;
   background-color: rgba(0,0,0,0.5);
   width: 100%;
   height: 100%;
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
 }
 #datetime .info h1 {
   padding-left: 5px;
@@ -43,9 +35,18 @@ body {
   font-size: 1em;
   color: #fff;
 }
-.info {
+#datetime img {
   position: relative;
+  z-index: 999;
+}
+.info {
+  position: absolute;
   height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
 }
 .images-container {
   width: 100%;
@@ -79,13 +80,13 @@ body {
 /*width 300px
     height 300px*/
   height: 33.333333%;
-  width: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
   display: inline;
 }
 .box-image img {
+  position: relative;
   height: 100%;
 }
 .transparent {
