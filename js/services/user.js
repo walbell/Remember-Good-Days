@@ -1,5 +1,5 @@
 (function(){
-	var userService = function (localStorageService) {
+	var userService = function (localStorageService, $location) {
 		return {
 			storeUserToken: function(user_token){
 				localStorageService.set('user_token', user_token);
@@ -29,9 +29,13 @@
 			},
 			checkIfUserIsAuthenticated: function(){
 				return localStorageService.get('user_token') ? true : false;
+			},
+			logout: function(){
+				localStorageService.clearAll();
+				$location.path('/login');
 			}
 		}
 	};
 
-	angular.module("myApp").factory('userService', ['localStorageService', userService]);
+	angular.module("myApp").factory('userService', ['localStorageService', '$location', userService]);
 }())

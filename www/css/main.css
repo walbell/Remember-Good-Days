@@ -95,6 +95,9 @@ body {
   bottom: 5px;
   right: 5px;
 }
+.settings .fui-power {
+  margin-right: 5px;
+}
 .user-info {
   padding: 50px;
 }

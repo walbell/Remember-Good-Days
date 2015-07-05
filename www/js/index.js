@@ -139,13 +139,17 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 
 (function(){
 
-	var MainController = function ($scope, $timeout, $location) {
+	var MainController = function ($scope, $timeout, $location, userService) {
 
 		//Date object 
 		$scope.date={};
 		$scope.go = function ( path ) {
 		  $location.path( path );
 		};
+
+		$scope.logout = function () {
+			userService.logout();
+		}
 
 		var updateTime = function(){
 			$scope.date.raw=new Date();
@@ -155,7 +159,7 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 		updateTime();
 	};
 
-	MainController.$inject = ['$scope', '$timeout', '$location'];
+	MainController.$inject = ['$scope', '$timeout', '$location', 'userService'];
 
 	angular.module('myApp').controller('MainController', MainController);
 
@@ -340,7 +344,7 @@ require('angular-local-storage');
 
 },{}],9:[function(require,module,exports){
 (function(){
-	var userService = function (localStorageService) {
+	var userService = function (localStorageService, $location) {
 		return {
 			storeUserToken: function(user_token){
 				localStorageService.set('user_token', user_token);
@@ -370,11 +374,15 @@ require('angular-local-storage');
 			},
 			checkIfUserIsAuthenticated: function(){
 				return localStorageService.get('user_token') ? true : false;
+			},
+			logout: function(){
+				localStorageService.clearAll();
+				$location.path('/login');
 			}
 		}
 	};
 
-	angular.module("myApp").factory('userService', ['localStorageService', userService]);
+	angular.module("myApp").factory('userService', ['localStorageService', '$location', userService]);
 }())
 
 },{}],10:[function(require,module,exports){
