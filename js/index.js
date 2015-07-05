@@ -13,6 +13,7 @@ require('./app.js');
 require('./controllers/mainCtrl.js');
 require('./controllers/imagesCtrl.js');
 require('./controllers/settingsCtrl.js');
+require('./controllers/loginCtrl.js');
 
 /**
  * Services

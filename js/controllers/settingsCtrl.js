@@ -18,7 +18,6 @@
 			.then(function(data) {
 				$scope.user = data.user;
 			})
-
 		};
 	}
 

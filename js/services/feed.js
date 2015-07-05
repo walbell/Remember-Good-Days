@@ -13,7 +13,8 @@
 					endpoint = instagramServerAPI + 'users/' + user_id + '/media/recent?access_token=' + access_token + '&callback=JSON_CALLBACK&count=50',
 					deferred = $q.defer(),
 					date_last_access = Date.parse(userService.getCurrentUserTimestamp()),
-					date_current_access = new Date(); 
+					date_current_access = new Date(),
+					last_user_feed = userService.getUserFeed(); 
 
 				function getRecentMedia (URL, count){
 					$http.jsonp(URL.replace(/angular.callbacks._\d/,'JSON_CALLBACK')).success(function(response) {
@@ -24,7 +25,7 @@
 							user_media_list.push(response.data[i]);
 						}
 
-						if (response.pagination.next_url && count <= 5 ) {
+						if (response.pagination.next_url && count <= 5 && user_media_list.length == 0) {
 						   count = count + 1;
 	                       getRecentMedia(response.pagination.next_url, count);
 						}
@@ -36,13 +37,15 @@
                 	});
                 }
 
-                if (date_current_access - date_last_access > MAX_TIME_BEFORE_REFRESH)
+
+
+                if (date_current_access - date_last_access < MAX_TIME_BEFORE_REFRESH && last_user_feed.length > 0)
                 {
-	                getRecentMedia(endpoint, 0);
+	                deferred.resolve(last_user_feed);
                 }
                 else
                 {
-                	deferred.resolve(userService.getUserFeed());
+                	getRecentMedia(endpoint, 0);
                 }
 
 				return deferred.promise;

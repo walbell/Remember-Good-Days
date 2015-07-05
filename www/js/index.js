@@ -20,6 +20,11 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 		controller:'SettingsController',
 		templateUrl:'../templates/settings.html'
 	})
+	.when('/login',
+	{
+		controller:'LoginController',
+		templateUrl:'../templates/login.html'
+	})
 })
 .directive('imageonload', function($rootScope) {
     return {
@@ -30,7 +35,21 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
             });
         }
     };
-});
+})
+.run(function($rootScope, $location, userService) {
+    // register listener to watch route changes
+    $rootScope.$on("$routeChangeStart", function(event, next, current) {
+      if ( !userService.checkIfUserIsAuthenticated()) {
+        // no logged user, we should be going to #login
+        if ( next.templateUrl == "login.html" ) {
+          // already going to #login, no redirect needed
+        } else {
+          // not going to #login, we should redirect now
+          $location.path( "/login" );
+        }
+      }         
+    });
+ })
 
 },{}],2:[function(require,module,exports){
 /* global angular */
@@ -94,6 +113,26 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 }());
 
 },{}],3:[function(require,module,exports){
+(function(){
+	var LoginController = function($scope, authService, $location) {
+
+		//initializing the authService
+		authService.initialize();
+
+		$scope.login = function () {
+			authService.connectInstagram()
+			.then(function(data) {
+				// $scope.user = data.user;
+				$location.path('/');
+			})
+		};
+	};
+
+	LoginController.$inject = ['$scope', 'authService', '$location'];
+
+	angular.module('myApp').controller('LoginController', LoginController);
+}())
+},{}],4:[function(require,module,exports){
 /* global angular */
 
 'use strict';
@@ -122,7 +161,7 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 
 }());
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /* global angular, authService, $scope */
 
 'use strict';
@@ -143,7 +182,6 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 			.then(function(data) {
 				$scope.user = data.user;
 			})
-
 		};
 	}
 
@@ -153,7 +191,7 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 
 }());
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /**
  * Index requiring all services and controllers
  */
@@ -169,6 +207,7 @@ require('./app.js');
 require('./controllers/mainCtrl.js');
 require('./controllers/imagesCtrl.js');
 require('./controllers/settingsCtrl.js');
+require('./controllers/loginCtrl.js');
 
 /**
  * Services
@@ -183,7 +222,7 @@ require('./services/feed.js');
 require('angular-local-storage');
 
 
-},{"./app.js":1,"./controllers/imagesCtrl.js":2,"./controllers/mainCtrl.js":3,"./controllers/settingsCtrl.js":4,"./services/auth.js":6,"./services/feed.js":7,"./services/user.js":8,"angular-local-storage":9}],6:[function(require,module,exports){
+},{"./app.js":1,"./controllers/imagesCtrl.js":2,"./controllers/loginCtrl.js":3,"./controllers/mainCtrl.js":4,"./controllers/settingsCtrl.js":5,"./services/auth.js":7,"./services/feed.js":8,"./services/user.js":9,"angular-local-storage":10}],7:[function(require,module,exports){
 /* global OAuth */
  
 'use strict';
@@ -240,7 +279,7 @@ require('angular-local-storage');
 
 }())
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function(){
 	var feedService = function($q, $http, userService) {
 
@@ -256,7 +295,8 @@ require('angular-local-storage');
 					endpoint = instagramServerAPI + 'users/' + user_id + '/media/recent?access_token=' + access_token + '&callback=JSON_CALLBACK&count=50',
 					deferred = $q.defer(),
 					date_last_access = Date.parse(userService.getCurrentUserTimestamp()),
-					date_current_access = new Date(); 
+					date_current_access = new Date(),
+					last_user_feed = userService.getUserFeed(); 
 
 				function getRecentMedia (URL, count){
 					$http.jsonp(URL.replace(/angular.callbacks._\d/,'JSON_CALLBACK')).success(function(response) {
@@ -267,7 +307,7 @@ require('angular-local-storage');
 							user_media_list.push(response.data[i]);
 						}
 
-						if (response.pagination.next_url && count <= 5 ) {
+						if (response.pagination.next_url && count <= 5 && user_media_list.length == 0) {
 						   count = count + 1;
 	                       getRecentMedia(response.pagination.next_url, count);
 						}
@@ -279,13 +319,15 @@ require('angular-local-storage');
                 	});
                 }
 
-                if (date_current_access - date_last_access > MAX_TIME_BEFORE_REFRESH)
+
+
+                if (date_current_access - date_last_access < MAX_TIME_BEFORE_REFRESH && last_user_feed.length > 0)
                 {
-	                getRecentMedia(endpoint, 0);
+	                deferred.resolve(last_user_feed);
                 }
                 else
                 {
-                	deferred.resolve(userService.getUserFeed());
+                	getRecentMedia(endpoint, 0);
                 }
 
 				return deferred.promise;
@@ -296,7 +338,7 @@ require('angular-local-storage');
 	angular.module('myApp').factory('feedService', ['$q', '$http', 'userService', feedService]);
 }());
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function(){
 	var userService = function (localStorageService) {
 		return {
@@ -318,7 +360,7 @@ require('angular-local-storage');
 				localStorageService.set('user_feed', user_feed);
 			},
 			getUserFeed: function(){
-				return localStorageService.get('user_feed');
+				return localStorageService.get('user_feed') || [];
 			},
 			storeCurrentUserTimestamp: function(){
 				localStorageService.set('user_timestamp', new Date());
@@ -326,13 +368,16 @@ require('angular-local-storage');
 			getCurrentUserTimestamp: function(){
 				return localStorageService.get('user_timestamp');
 			},
+			checkIfUserIsAuthenticated: function(){
+				return localStorageService.get('user_token') ? true : false;
+			}
 		}
 	};
 
 	angular.module("myApp").factory('userService', ['localStorageService', userService]);
 }())
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  * An Angular module that gives you access to the browsers local storage
  * @version v0.2.2 - 2015-05-29
@@ -780,4 +825,4 @@ angularLocalStorage.provider('localStorageService', function() {
   }];
 });
 })( window, window.angular );
-},{}]},{},[5])
+},{}]},{},[6])

@@ -19,6 +19,11 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 		controller:'SettingsController',
 		templateUrl:'../templates/settings.html'
 	})
+	.when('/login',
+	{
+		controller:'LoginController',
+		templateUrl:'../templates/login.html'
+	})
 })
 .directive('imageonload', function($rootScope) {
     return {
@@ -29,4 +34,18 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
             });
         }
     };
-});
+})
+.run(function($rootScope, $location, userService) {
+    // register listener to watch route changes
+    $rootScope.$on("$routeChangeStart", function(event, next, current) {
+      if ( !userService.checkIfUserIsAuthenticated()) {
+        // no logged user, we should be going to #login
+        if ( next.templateUrl == "login.html" ) {
+          // already going to #login, no redirect needed
+        } else {
+          // not going to #login, we should redirect now
+          $location.path( "/login" );
+        }
+      }         
+    });
+ })
