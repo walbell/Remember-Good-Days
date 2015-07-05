@@ -34,10 +34,8 @@
 
 			if ($scope.images_loaded < MAX_PHOTOS - 1) {
 				$scope.images_loaded += 1;
-				console.log($scope.images_loaded);
 			}
 			else if ($scope.images_loaded === MAX_PHOTOS - 1) {
-				console.log('images loaded');
 				$scope.display_images = true;
 			}
 		});

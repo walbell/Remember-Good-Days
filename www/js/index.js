@@ -88,10 +88,8 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 
 			if ($scope.images_loaded < MAX_PHOTOS - 1) {
 				$scope.images_loaded += 1;
-				console.log($scope.images_loaded);
 			}
 			else if ($scope.images_loaded === MAX_PHOTOS - 1) {
-				console.log('images loaded');
 				$scope.display_images = true;
 			}
 		});
@@ -116,6 +114,9 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 (function(){
 	var LoginController = function($scope, authService, $location) {
 
+		//track login on mixpanel
+		mixpanel.track('Open');
+
 		//initializing the authService
 		authService.initialize();
 
@@ -124,6 +125,12 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 			.then(function(data) {
 				// $scope.user = data.user;
 				$location.path('/');
+				mixpanel.track('Login Successful');
+				mixpanel.identify(data.user.username);
+				mixpanel.people.set({
+				    "$name": data.user.username,
+				    "$last_login": new Date()
+				});
 			})
 		};
 	};
@@ -173,9 +180,6 @@ angular.module('myApp', ['ngRoute', 'LocalStorageModule', 'ngAnimate'])
 (function(){
 
 	var SettingsController = function ($scope,authService) {
-
-		console.log('SettingsController');
-
 
 		//initializing the authService
 		
@@ -300,12 +304,12 @@ require('angular-local-storage');
 					deferred = $q.defer(),
 					date_last_access = Date.parse(userService.getCurrentUserTimestamp()),
 					date_current_access = new Date(),
-					last_user_feed = userService.getUserFeed(); 
+					last_user_feed = userService.getUserFeed();
+
+				mixpanel.track('Load feed');
 
 				function getRecentMedia (URL, count){
 					$http.jsonp(URL.replace(/angular.callbacks._\d/,'JSON_CALLBACK')).success(function(response) {
-
-						console.log('getting data', response.data);
 						
 						for (var i in response.data) {
 							user_media_list.push(response.data[i]);

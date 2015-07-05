@@ -6,9 +6,6 @@
 
 	var SettingsController = function ($scope,authService) {
 
-		console.log('SettingsController');
-
-
 		//initializing the authService
 		
 		authService.initialize();
