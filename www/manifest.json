@@ -1,6 +1,6 @@
 {
  "manifest_version": 2,
-	"name": "Remember good days",
+	"name": "Remember good days - New Tab",
 	"description": "Tab app to show best moments from Instagram",
     "version": "0.2",
     "background": {
